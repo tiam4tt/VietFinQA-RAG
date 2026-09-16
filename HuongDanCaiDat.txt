@@ -1,0 +1,103 @@
+HUONG DAN CAI DAT - DE TAI T826_KL_CNTT12
+================================================
+
+1. THONG TIN CHUNG
+------------------
+- Ma de tai: T826_KL_CNTT12
+- Cau truc file MaNguon.zip sau khi giai nen:
+    T826_KL_CNTT12/
+    |-- src/                      (toan bo chuong trinh)
+    |   |-- 0_dataset_construction/ (14 notebook pipeline tao du lieu + utils/)
+    |   |-- 1_baseline/             (3 notebook baseline RAG)
+    |   |-- 2_proposed_method/      (1 notebook phan loai + TRAINING/9 notebook + INFERENCE/9 file .py)
+    |   |-- 3_evaluation/           (2 notebook danh gia)
+    |   |-- 4_dataset/              (du lieu CSV giu nguyen de demo)
+    |   |-- requirements.txt        (file tong hop thu vien)
+    |-- HuongDanCaiDat.txt          (file nay)
+    |-- HuongDanSuDung.txt          (huong dan bien dich va chay)
+
+- LUU Y QUAN TRONG: File zip KHONG bao gom thu vien (site-packages, venv,
+  __pycache__, *.pyc, .ipynb_checkpoints). Nguoi cham can cai dat thu vien
+  theo muc 4 duoi day.
+
+2. CONG CU CAN THIET
+--------------------
+- He dieu hanh: Windows 10/11, Ubuntu 20.04/22.04 hoac macOS (khuyen nghi Ubuntu de train).
+- Python: 3.10 hoac 3.11 (64-bit). Kiem tra: python --version
+- pip >= 23.0. Kiem tra: pip --version
+- Git (tuy chon, de quan ly ma nguon).
+- Jupyter: Jupyter Notebook >= 7.0 hoac JupyterLab >= 4.0
+  (hoac chay truc tiep tren VS Code, Google Colab, Kaggle).
+- Trinh giai nen ho tro UTF-8 (7-Zip, WinRAR, unzip tren Linux).
+- Dung luong: ~1 GB trong de giai nen (ma nguon + dataset kem theo ~500 MB),
+  them ~5-10 GB neu cai day du thu vien deep learning + cache model.
+- GPU (khuyen nghi cho demo inference va bat buoc cho train):
+  NVIDIA co CUDA 11.8 / 12.x, VRAM >= 16 GB (Qwen3-1.7B, Llama-3.2-1B o che do FP16).
+  Neu chi chay CPU van duoc nhung rat cham. Train/inference goc chay tren Kaggle GPU.
+
+3. MOI TRUONG PHAT TRIEN
+------------------------
+- Moi truong goc cua nhom: Python 3.10, PyTorch 2.x + CUDA, Jupyter Notebook,
+  thu vien chay chinh: transformers, accelerate, peft, sentence-transformers,
+  faiss-cpu, rank-bm25, ragas (xem file src/requirements.txt).
+- Tao moi truong sach (khuyen nghi):
+    python -m venv venv
+    # Windows:
+    venv\Scripts\activate
+    # Linux/macOS:
+    source venv/bin/activate
+    python -m pip install --upgrade pip
+
+4. CAI DAT THU VIEN (BAT BUOC, VI ZIP KHONG KEM THU VIEN)
+---------------------------------------------------------
+Buoc 1: Giai nen T826_KL_CNTT12_MaNguon.zip, mo terminal tai thu muc:
+    T826_KL_CNTT12/
+
+Buoc 2: Cai toan bo thu vien cho demo inference (baseline + proposed + evaluation):
+    pip install -r src/requirements.txt
+
+  Giai thich cac nhom trong requirements.txt:
+  - Core: pandas, numpy, pyarrow, tqdm, scikit-learn, matplotlib, seaborn.
+  - Xu ly tieng Viet va crawl: requests, beautifulsoup4, lxml, underthesea.
+  - RAG/Inference: torch, transformers, accelerate, peft, datasets,
+    sentencepiece, protobuf, sentence-transformers, faiss-cpu, rank-bm25.
+  - Danh gia: rouge-score, bert-score, ragas, langchain-*.
+  - API (chi can neu chay full pipeline tao du lieu):
+    google-generativeai, google-genai, google-cloud-aiplatform, openai.
+
+Buoc 3 (tuy chon, neu chi chay demo nhanh khong can train):
+  Van dung lenh o Buoc 2. Khong can cai them CUDA rieng neu pip da cai ban
+  torch tuong ung. Neu co GPU NVIDIA, cai ban torch CUDA theo huong dan
+  chinh thuc cua PyTorch (https://pytorch.org) truoc khi pip install -r.
+
+Buoc 4 (chi can neu chay lai full pipeline 0_dataset_construction):
+  Can API key:
+    export GEMINI_API_KEY="khoa-gemini-cua-ban"      # cho 5_CLS, 7_QA, 8_QA, 9_SUM
+    export OPENAI_API_KEY="khoa-openai-cua-ban"      # cho 10_QA-EVAL, 11_QA-EVAL
+  Chi phi tham khao: ~5-10 USD cho moi dot Q/A generation bang Gemini batch API.
+  Thoi gian full pipeline: 12-24 gio, sinh file trung gian 15-20 GB
+  (khong can thiet cho demo cham diem).
+
+5. KIEM TRA CAI DAT THANH CONG
+------------------------------
+    python -c "import torch, transformers, peft, sentence_transformers, faiss, rank_bm25; print('OK')"
+    jupyter --version
+
+  Neu bao loi thieu module nao, chay lai:
+    pip install -r src/requirements.txt
+
+6. GHI CHU VE DU LIEU VA MODEL
+-------------------------------
+- Thu muc src/4_dataset/ da kem day du 13 file CSV (train/val/test/gold_test
+  cho 3 nhom data-merge, data-segmentation, data-summarization) de nguoi cham
+  chay demo offline, khong can tai them.
+- Nguon goc dataset VietFinQA (111.782 cap QA): https://www.kaggle.com/datasets/tiam4tt/vietfinqa
+- Adapter LoRA tot nhat (*_best_adapter.pt) va backbone merge
+  (vi du HTThuanHcmus/qwen3-1.7b-merge) KHONG kem trong zip vi dung luong lon.
+  Khi chay inference, script se tu tai backbone tu HuggingFace; adapter can
+  chi duong dan cuc bo (xem HuongDanSuDung.txt muc 3).
+- Tat ca file trung gian (__pycache__, *.pyc, .ipynb_checkpoints) va output
+  cua notebook da duoc xoa truoc khi dong goi.
+
+================================================
+Lien he nhom thuc hien de tai T826_KL_CNTT12 neu can ho tro cai dat.

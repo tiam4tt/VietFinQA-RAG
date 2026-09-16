@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data files (large CSVs - download from Kaggle per README)
+src/4_dataset/data-merge/train.csv
+src/4_dataset/data-merge/val.csv
+src/4_dataset/data-merge/test.csv
+src/4_dataset/data-merge/gold_test.csv
+src/4_dataset/data-merge/gold_test_annotated.csv
+src/4_dataset/data-segmentation/train.csv
+src/4_dataset/data-segmentation/val.csv
+src/4_dataset/data-segmentation/test.csv
+src/4_dataset/data-segmentation/gold_test.csv
+src/4_dataset/data-summarization/train.csv
+src/4_dataset/data-summarization/val.csv
+src/4_dataset/data-summarization/test.csv
+src/4_dataset/data-summarization/gold_test.csv
+
+# Model outputs and checkpoints
+*.pt
+*.pth
+*.bin
+*.safetensors
+outputs/
+./outputs/
+
+# Environment
+*.env
+.env
+
+# Dependencies
+*.egg-info/
+dist/
+build/
+
+# Logs
+*.log
+
+# Temporary
+*.tmp
+*.bak

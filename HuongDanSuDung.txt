@@ -1,0 +1,103 @@
+HUONG DAN SU DUNG (BIEN DICH VA CHAY) - DE TAI T826_KL_CNTT12
+================================================================
+
+Pham vi demo khi cham diem: chay INFERENCE cua baseline va phuong phap de xuat
+(SCS-LoRA) tren tap gold_test co san. Khong can chay lai train hay full pipeline
+12-24 gio.
+
+1. CHUAN BI
+-----------
+1.1. Giai nen file zip, giu nguyen cau truc:
+    T826_KL_CNTT12/
+    |-- src/
+    |-- HuongDanCaiDat.txt
+    |-- HuongDanSuDung.txt (file nay)
+
+1.2. Cai dat thu vien mot lan duy nhat (xem HuongDanCaiDat.txt muc 4):
+    cd T826_KL_CNTT12
+    pip install -r src/requirements.txt
+
+1.3. Chuong trinh khong can buoc bien dich rieng (Python + Jupyter):
+  - File .py chay truc tiep bang python.
+  - File .ipynb mo bang Jupyter/VS Code roi Run All.
+  - Kiem tra cu phap nhanh:
+    python -m py_compile src/2_proposed_method/INFERENCE/qwen3_1_7b_scs_lora_test_inference.py
+
+2. CHAY DEMO NHANH (KHUYEN NGHI CHO CHAM DIEM)
+----------------------------------------------
+Demo 1 - Baseline RAG (de nhat, khong can adapter):
+  Mo 1 trong 3 notebook bang Jupyter:
+    src/1_baseline/0_baseline-llama3_2-1b.ipynb
+    src/1_baseline/1_baseline-qwen3-0_6b.ipynb
+    src/1_baseline/2_baseline-qwen3-1_7b.ipynb
+  Chay tuan tu tu tren xuong duoi (Run All). Notebook se doc du lieu tu
+  src/4_dataset/, truy hoi bang BGE-M3 dense + BM25 + RRF + reranker va sinh
+  cau tra loi, sau do cham ROUGE/BERTScore.
+
+Demo 2 - Phuong phap de xuat SCS-LoRA (trong tam cua de tai):
+  File mau:
+    src/2_proposed_method/INFERENCE/qwen3_1_7b_scs_lora_test_inference.py
+  Cac bien the khac trong cung thu muc INFERENCE/:
+    - llama_3_2_1b_scs_lora_test_inference.py
+    - qwen3_0_6b_scs_lora_test_inference.py
+    - qwen3_1_7b_scs_lora_scale_0_5_test_inference.py / scale_2 / r4_a8 / r16_a32
+    - qwen3_1_7b_scs_lora_no_prompt_test_inference.py
+    - qwen3_1_7b_mixture_lora_soft_routing_test.py
+
+  LUU Y DUONG DAN: script goc viet cho Kaggle voi duong dan co dinh:
+      DATA_DIR = Path('/kaggle/input/data-merge')
+      ADAPTER_DIR = Path('/kaggle/input/merge-scs-lora-adapter')
+  Khi chay local, sua 2 dong nay o dau file .py thanh duong dan tuong doi:
+      DATA_DIR = Path('src/4_dataset/data-merge')        # chua gold_test_annotated.csv
+      ADAPTER_DIR = Path('duong/dan/toi/adapter-cua-ban') # chua *_best_adapter.pt
+  Hoac tao symlink / copy du lieu cho khop ten.
+
+  Chay:
+    cd T826_KL_CNTT12
+    python src/2_proposed_method/INFERENCE/qwen3_1_7b_scs_lora_test_inference.py
+  Ket qua: file *_predictions.csv trong thu muc OUTPUT_DIR khai bao trong script
+  (mac dinh ./outputs/ hoac /kaggle/working — xem bien PRED_FINAL_PATH trong code,
+  co the sua lai duong dan local).
+
+  Bien INFERENCE_SPLIT trong script nhan 'gold_test' hoac 'test':
+  - 'gold_test' (mac dinh demo): doc src/4_dataset/data-merge/gold_test_annotated.csv
+  - 'test': doc src/4_dataset/data-merge/test.csv (nang hon)
+
+Demo 3 - Danh gia (sau khi co file predictions):
+    src/3_evaluation/0_EVAL-local-metrics.ipynb   (ROUGE, BERTScore, Ematch chay offline)
+    src/3_evaluation/1_EVAL-ragas.ipynb           (can OPENAI_API_KEY, chay online)
+  Mo bang Jupyter va Run All, chi duong dan predictions vua sinh o Demo 2.
+
+3. CHAY NANG CAO (KHONG BAT BUOC KHI CHAM)
+------------------------------------------
+- Train lai: cac notebook trong src/2_proposed_method/TRAINING/
+  (vi du train_scs_qwen3_1_7b.ipynb). Can GPU >= 16 GB, backbone tu HuggingFace
+  (HTThuanHcmus/qwen3-1.7b-merge...), du lieu train o src/4_dataset/.
+  Thoi gian vai gio den 1 ngay tuy cau hinh.
+- Phan loai cau hoi: src/2_proposed_method/0_CLS-question-type.ipynb
+- Tao du lieu tu dau: xem thu tu trong src/0_dataset_construction/NOTEBOOKS.md
+  (can GEMINI_API_KEY + OPENAI_API_KEY, ton 12-24 gio).
+
+4. DU LIEU VAO/RA
+------------------
+- Vao (co san trong zip):
+    src/4_dataset/data-merge/gold_test.csv, gold_test_annotated.csv (demo chinh)
+    src/4_dataset/data-merge/test.csv, val.csv, train.csv (day du)
+    src/4_dataset/data-segmentation/*, src/4_dataset/data-summarization/*
+  Dinh dang: CSV cot url,title,time,context,question,answer,question_type
+  (question_type: FACTOID | SUMMARY | COMPARISON | VERIFICATION).
+- Ra: file *_predictions.csv + log console (DATA_DIR, INPUT_PATH, ADAPTER_PATH...).
+
+5. XU LY LOI THUONG GAP
+------------------------
+- FileNotFoundError: Missing Kaggle data directory -> chua sua DATA_DIR/ADAPTER_DIR
+  theo muc 2 Demo 2.
+- Adapter not found -> chi ADAPTER_DIR toi thu muc chua file *_best_adapter.pt.
+- ModuleNotFoundError (faiss, rank_bm25, peft...) -> pip install -r src/requirements.txt
+- CUDA out of memory -> giam batch size trong script/notebook, hoac chuyen
+  INFERENCE_SPLIT='gold_test', hoac chay ban 0.6B thay vi 1.7B.
+- HuggingFace 401/403 -> dang nhap: huggingface-cli login
+- Notebook kernel die -> restart kernel, chay lai tung cell.
+
+================================================================
+Chuc nang chinh de cham: Demo 1 + Demo 2 (gold_test) + Demo 3 (local-metrics).
