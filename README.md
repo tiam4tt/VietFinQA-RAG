@@ -1,6 +1,6 @@
-# T826_KL_CNTT12
+# VietFinQA-RAG
 
-Vietnamese Financial Question Answering with RAG and SCS-LoRA.
+Vietnamese Financial Question Answering with RAG and Soft Cascaded Shared-type LoRA.
 
 ## Overview
 
@@ -9,7 +9,7 @@ A thesis project building a Vietnamese financial QA system using the VietFinQA d
 ## Structure
 
 ```
-T826_KL_CNTT12/
+root/
 ├── src/
 │   ├── 0_dataset_construction/  # Data pipeline (14 notebooks + utils)
 │   ├── 1_baseline/              # Baseline RAG (Llama-3.2-1B, Qwen3-0.6B, Qwen3-1.7B)
